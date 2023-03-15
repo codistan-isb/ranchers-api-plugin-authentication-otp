@@ -1,5 +1,5 @@
 {
-  "name": "@blackspider1994/api-plugin-authentication-otp",
+  "name": "@shoaibfarooq3/api-plugin-authentication-otp",
   "description": "Authentication plugin for the Reaction API",
   "version": "2.0.0",
   "main": "index.js",
