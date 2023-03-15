@@ -5,7 +5,8 @@ var dict = {};
 
 var accountSid = process.env.TWILIO_ACCOUNT_SID;
 var authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = new Twilio(accountSid, authToken);
+// const client = new Twilio(accountSid, authToken);
+const client = new Twilio("ACa6213af064b", "");
 
 export function generateOtp(number) {
   return new Promise((resolve, reject) => {
@@ -16,8 +17,8 @@ export function generateOtp(number) {
       let my_otp = 123456; // () => [ min, max );
       // let my_otp = Math.floor(Math.random() * (max - min + 1) + min); // () => [ min, max );
       dict[number] = { code: my_otp, expiry: new Date().getTime() + 60000 };
-      console.log("otp generated",  number,
-      "Your verification code for is " + my_otp)
+      console.log("otp generated", number,
+        "Your verification code for is " + my_otp)
       sendOtp(
         number,
         "Your verification code for is " + my_otp
