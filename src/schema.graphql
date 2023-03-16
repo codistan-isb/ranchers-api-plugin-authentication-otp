@@ -14,7 +14,15 @@ extend input CreateUserInput {
   otp: String
   govId: [String]
   proofOfAddress: [String]
+  # isOtp: Boolean
+  UserRole: UserRoleValue
 }
+enum UserRoleValue {
+  admin
+  dispatcher
+  rider
+}
+
 type CreateUserResult {
   phone: String
   firstName: String
@@ -22,6 +30,7 @@ type CreateUserResult {
   otp: String
   govId: [String]
   proofOfAddress: [String]
+  UserRole: String
 }
 
 type phone {

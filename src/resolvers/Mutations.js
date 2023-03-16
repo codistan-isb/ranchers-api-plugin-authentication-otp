@@ -3,6 +3,7 @@ import { verifyOTP } from "../util/otp.js";
 
 import password_1 from "@accounts/password";
 import server_1 from "@accounts/server";
+import { canCreateUser } from "../util/checkUserRole.js";
 
 export default {
   async sendOTP(parent, args, context, info) {
@@ -37,10 +38,9 @@ export default {
     const phone = args.phone;
     console.log(args)
 
-    let userExist = await users.findOne({ phone: phone});
+    let userExist = await users.findOne({ phone: phone });
     if (!userExist) {
-
-      userExist = await users.findOne({ 'emails.0.address': email  });
+      userExist = await users.findOne({ 'emails.0.address': email });
     }
 
     console.log("userExist");
@@ -57,82 +57,146 @@ export default {
   },
   resetPassword: async (_, { token, newPassword }, { injector, infos }) => {
     return injector.get(password_1.AccountsPassword).resetPassword(token, newPassword, infos);
-},
+  },
 
-sendResetPasswordEmail: async (_, { email }, { injector }) => {
-  const accountsServer = injector.get(server_1.AccountsServer);
-  const accountsPassword = injector.get(password_1.AccountsPassword);
-  try {
+  sendResetPasswordEmail: async (_, { email }, { injector }, ctx) => {
+    const accountsServer = injector.get(server_1.AccountsServer);
+    const accountsPassword = injector.get(password_1.AccountsPassword);
+
+    try {
       await accountsPassword.sendResetPasswordEmail(email);
-  }
-  catch (error) {
+    }
+    catch (error) {
       // If ambiguousErrorMessages is true,
       // to prevent user enumeration we fail silently in case there is no user attached to this email
       if (accountsServer.options.ambiguousErrorMessages &&
-          error instanceof server_1.AccountsJsError &&
-          error.code === password_1.SendResetPasswordEmailErrors.UserNotFound) {
-          return null;
+        error instanceof server_1.AccountsJsError &&
+        error.code === password_1.SendResetPasswordEmailErrors.UserNotFound) {
+        return null;
       }
       throw error;
-  }
-  return null;
-},
+    }
+    return null;
+  },
   async createUser(_, { user }, ctx) {
+    console.log(user);
+
     const { injector, infos, collections } = ctx;
-    // const { Accounts } = collections;
+    const { Accounts } = collections;
     const accountsServer = injector.get(server_1.AccountsServer);
     const accountsPassword = injector.get(password_1.AccountsPassword);
     let userId;
 
-    try {
-      userId = await accountsPassword.createUser(user);
-    } catch (error) {
-      // If ambiguousErrorMessages is true we obfuscate the email or username already exist error
-      // to prevent user enumeration during user creation
-      if (
-        accountsServer.options.ambiguousErrorMessages &&
-        error instanceof server_1.AccountsJsError &&
-        (error.code === password_1.CreateUserErrors.EmailAlreadyExists ||
-          error.code === password_1.CreateUserErrors.UsernameAlreadyExists)
-      ) {
-        return {};
+    if (!user.UserRole) {
+      try {
+        userId = await accountsPassword.createUser(user);
+      } catch (error) {
+        // If ambiguousErrorMessages is true we obfuscate the email or username already exist error
+        // to prevent user enumeration during user creation
+        if (
+          accountsServer.options.ambiguousErrorMessages &&
+          error instanceof server_1.AccountsJsError &&
+          (error.code === password_1.CreateUserErrors.EmailAlreadyExists ||
+            error.code === password_1.CreateUserErrors.UsernameAlreadyExists)
+        ) {
+          return {};
+        }
+        throw error;
       }
-      throw error;
-    }
-    if (!accountsServer.options.enableAutologin) {
+      if (!accountsServer.options.enableAutologin) {
+        return {
+          userId: accountsServer.options.ambiguousErrorMessages ? null : userId,
+        };
+      }
+      // if (userId) {
+      //         const accountAdded = await Accounts.insertOne({ _id: userId, firstName: user.firstName, lastName: user.lastName, name: user.firstName + " " + user.lastName, phone: user.phone })
+
+      // }
+      // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
+      // are not enabled at the same time
+      const createdUser = await accountsServer.findUserById(userId);
+      // If we are here - user must be created successfully
+      // Explicitly saying this to Typescript compiler
+      const loginResult = await accountsServer.loginWithUser(createdUser, infos);
+      await generateOtp(user.phone);
       return {
-        userId: accountsServer.options.ambiguousErrorMessages ? null : userId,
+        userId,
+        // loginResult,
       };
     }
-    // if (userId) {
-    //         const accountAdded = await Accounts.insertOne({ _id: userId, firstName: user.firstName, lastName: user.lastName, name: user.firstName + " " + user.lastName, phone: user.phone })
+    else {
+      if (!ctx.authToken) {
+        throw new Error("Unauthorized")
+      }
+      if (ctx.user === undefined || ctx.user === null) {
+        throw new Error("Unauthorized")
+      }
+      console.log(ctx.user.userRole)
+      console.log(user)
+      console.log(user.UserRole)
 
-    // }
-    // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
-    // are not enabled at the same time
-    const createdUser = await accountsServer.findUserById(userId);
-    // If we are here - user must be created successfully
-    // Explicitly saying this to Typescript compiler
-    const loginResult = await accountsServer.loginWithUser(createdUser, infos);
-    await generateOtp(user.phone);
-    return {
-      userId,
-      // loginResult,
-    };
+      // Check Permission for create user
+
+      const UserPermission = canCreateUser(ctx.user.userRole, user.UserRole)
+      console.log(UserPermission)
+      if (UserPermission) {
+        // Allow user creation
+        try {
+          userId = await accountsPassword.createUser(user);
+        } catch (error) {
+          // If ambiguousErrorMessages is true we obfuscate the email or username already exist error
+          // to prevent user enumeration during user creation
+          if (
+            accountsServer.options.ambiguousErrorMessages &&
+            error instanceof server_1.AccountsJsError &&
+            (error.code === password_1.CreateUserErrors.EmailAlreadyExists ||
+              error.code === password_1.CreateUserErrors.UsernameAlreadyExists)
+          ) {
+            return {};
+          }
+          throw error;
+        }
+        if (!accountsServer.options.enableAutologin) {
+          return {
+            userId: accountsServer.options.ambiguousErrorMessages ? null : userId,
+          };
+        }
+        // if (userId) {
+        //         const accountAdded = await Accounts.insertOne({ _id: userId, firstName: user.firstName, lastName: user.lastName, name: user.firstName + " " + user.lastName, phone: user.phone })
+
+        // }
+        // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
+        // are not enabled at the same time
+        const createdUser = await accountsServer.findUserById(userId);
+        // If we are here - user must be created successfully
+        // Explicitly saying this to Typescript compiler
+        const loginResult = await accountsServer.loginWithUser(createdUser, infos);
+        await generateOtp(user.phone);
+        return {
+          userId,
+          // loginResult,
+        };
+      } else {
+        // Deny user creation
+        throw new Error("Unauthorized")
+      }
+
+
+    }
   },
   changePassword: async (_, { oldPassword, newPassword }, { user, injector }) => {
     if (!(user && user.id)) {
-        throw new Error('Unauthorized');
+      throw new Error('Unauthorized');
     }
     const userId = user.id;
     await injector.get(password_1.AccountsPassword).changePassword(userId, oldPassword, newPassword);
     return null;
-},
+  },
   async createUserWithOtp(_, { user }, ctx) {
     const { injector, infos, collections } = ctx;
     const accountsServer = injector.get(server_1.AccountsServer);
     const accountsPassword = injector.get(password_1.AccountsPassword);
-    const { Accounts,users } = collections;
+    const { Accounts, users } = collections;
 
     let userId;
 
@@ -157,35 +221,35 @@ sendResetPasswordEmail: async (_, { email }, { injector }) => {
         userId: accountsServer.options.ambiguousErrorMessages ? null : userId,
       };
     }
-   
 
-    const adminCount=await Accounts.findOne({"adminUIShopIds.0":{$ne:null}});
-    console.log("adminCount",adminCount);
+
+    const adminCount = await Accounts.findOne({ "adminUIShopIds.0": { $ne: null } });
+    console.log("adminCount", adminCount);
     if (userId && adminCount?._id) {
-            console.log("user",user)
-            const account={
-                    "_id" : userId,
-                    "acceptsMarketing" : false,
-                    "emails" : [ 
-                        {
-                            "address" : user.email,
-                            "verified" : false,
-                            "provides" : "default"
-                        }
-                    ],
-                    "groups" : [],
-                    "name" : null,
-                    "profile" : {
-                            firstName:user.firstName,
-                            lastName:user.lastName,
-                            dob:user.dob,
-                            phone:user.phone,
-                    },
-                    "shopId" : null,
-                    "state" : "new",
-                    "userId" : userId
-                }
-            const accountAdded = await Accounts.insertOne(account);
+      console.log("user", user)
+      const account = {
+        "_id": userId,
+        "acceptsMarketing": false,
+        "emails": [
+          {
+            "address": user.email,
+            "verified": false,
+            "provides": "default"
+          }
+        ],
+        "groups": [],
+        "name": null,
+        "profile": {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          dob: user.dob,
+          phone: user.phone,
+        },
+        "shopId": null,
+        "state": "new",
+        "userId": userId
+      }
+      const accountAdded = await Accounts.insertOne(account);
 
     }
     // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
@@ -206,9 +270,9 @@ sendResetPasswordEmail: async (_, { email }, { injector }) => {
     const { users } = collections;
     console.log("authenticate")
     const authenticated = await injector
-    .get(server_1.AccountsServer)
-    .loginWithService(serviceName, params, infos);
-  return authenticated;
+      .get(server_1.AccountsServer)
+      .loginWithService(serviceName, params, infos);
+    return authenticated;
   },
   authenticateWithOTP: async (_, args, ctx) => {
     const { serviceName, params } = args;

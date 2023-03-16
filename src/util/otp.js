@@ -11,7 +11,6 @@ const client = new Twilio("ACa6213af064b", "");
 export function generateOtp(number) {
   return new Promise((resolve, reject) => {
     try {
-
       let min = 100000;
       let max = 999999;
       let my_otp = 123456; // () => [ min, max );
