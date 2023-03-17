@@ -1,6 +1,7 @@
 import { generateOtp } from "../util/otp.js";
 import { verifyOTP } from "../util/otp.js";
-
+import pkg from 'mongodb';
+const { Long } = pkg;
 import password_1 from "@accounts/password";
 import server_1 from "@accounts/server";
 import { canCreateUser } from "../util/checkUserRole.js";
@@ -60,10 +61,22 @@ export default {
   },
 
   sendResetPasswordEmail: async (_, { email }, { injector }, ctx) => {
+    console.log(ctx)
+    const { backgroundJobs, collections } = ctx;
+    console.log(collections)
+    console.log(backgroundJobs)
     const accountsServer = injector.get(server_1.AccountsServer);
     const accountsPassword = injector.get(password_1.AccountsPassword);
-
+    // const randomNumber = Math.floor(Math.random() * 1000000);
+    // console.log(randomNumber)
+    // const user = await accountsServer.findUserByEmail(email);
+    // if (!user) {
+    //   throw new Error('User not found');
+    // }
     try {
+      // const otp = Math.floor(Math.random() * 1000000);
+      // await accountsPassword.sendResetPasswordEmail(user.id, otp);
+      // await accountsPassword.sendResetPasswordEmail(user, otp);
       await accountsPassword.sendResetPasswordEmail(email);
     }
     catch (error) {
@@ -80,7 +93,6 @@ export default {
   },
   async createUser(_, { user }, ctx) {
     console.log(user);
-
     const { injector, infos, collections } = ctx;
     const { Accounts } = collections;
     const accountsServer = injector.get(server_1.AccountsServer);
@@ -302,4 +314,54 @@ export default {
       return authenticated;
     }
   },
+
+
+  async deleteUser(parent, args, context, info) {
+    console.log("context.user ", context.user);
+    console.log("args ", args);
+    // console.log("context ", context)
+    if (context.user === undefined || context.user === null) {
+      throw new Error("Unauthorized access. Please login first");
+    }
+    if (!context.authToken) {
+      throw new Error('UnAuthorization!');
+    }
+    const { users } = context.collections;
+    const { phone } = args;
+
+    const phoneNum = Long.fromString(phone)
+    console.log(phoneNum)
+    const query = { phone: phoneNum };
+    console.log('query:', query);
+    // const usersList = await users.find().toArray();
+    // usersList.forEach(user => {
+    //   console.log(user.phone);
+    //   return user.phone
+    // });
+    const userResponse = await users.findOne({ phone: phone });
+    console.log("User Response : ", userResponse)
+    if (!userResponse) {
+      throw new Error(`User not found`);
+    }
+
+    const UserPermission = await canCreateUser(context.user.userRole, userResponse.userRole)
+    console.log(UserPermission)
+    if (UserPermission) {
+      const deleteResult = await users.deleteOne({ _id: userResponse._id });
+      console.log(deleteResult)
+      if (deleteResult.deletedCount > 0) {
+        return true; // User deleted successfully, return true
+      }
+      else {
+        return false
+      }
+    }
+    else {
+      // Deny user creation
+      throw new Error("Unauthorized")
+    }
+    return UserPermission;
+  }
+
+
 };

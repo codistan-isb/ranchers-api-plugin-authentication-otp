@@ -24,6 +24,7 @@ enum UserRoleValue {
 }
 
 type CreateUserResult {
+  id: ID
   phone: String
   firstName: String
   lastName: String
@@ -49,6 +50,7 @@ type sendOtpResponse {
 extend type Mutation {
   checkUserExist(phone: String, email: String): Boolean
   sendOTP(phone: String, email: String): Boolean
+  deleteUser(phone: String!): Boolean
 
   createUserWithOtp(user: CreateUserInput!): CreateUserResult
 
