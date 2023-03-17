@@ -326,7 +326,7 @@ export default {
     if (!context.authToken) {
       throw new Error('UnAuthorization!');
     }
-    const { users } = context.collections;
+    const { users, Accounts } = context.collections;
     const { phone } = args;
 
     const phoneNum = Long.fromString(phone)
@@ -339,6 +339,7 @@ export default {
     //   return user.phone
     // });
     const userResponse = await users.findOne({ phone: phone });
+    const userAccountResponse = await Accounts.findOne({ phone: phone });
     console.log("User Response : ", userResponse)
     if (!userResponse) {
       throw new Error(`User not found`);
@@ -349,6 +350,7 @@ export default {
     if (UserPermission) {
       const deleteResult = await users.deleteOne({ _id: userResponse._id });
       console.log(deleteResult)
+      const deleteAccountResult = await Accounts.deleteOne({ _id: userAccountResponse._id });
       if (deleteResult.deletedCount > 0) {
         return true; // User deleted successfully, return true
       }
