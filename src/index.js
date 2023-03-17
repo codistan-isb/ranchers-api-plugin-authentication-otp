@@ -39,9 +39,7 @@ export default async function register(app) {
       users: {
         name: "users"
       },
-      Accounts: {
-        name: "Accounts"
-      }
+
     },
     graphQL: {
       schemas: [mySchema],

@@ -351,7 +351,7 @@ export default {
       const deleteResult = await users.deleteOne({ _id: userResponse._id });
       console.log(deleteResult)
       const deleteAccountResult = await Accounts.deleteOne({ _id: userAccountResponse._id });
-      if (deleteResult.deletedCount > 0) {
+      if (deleteResult.deletedCount > 0 || deleteAccountResult.deletedCount > 0) {
         return true; // User deleted successfully, return true
       }
       else {
