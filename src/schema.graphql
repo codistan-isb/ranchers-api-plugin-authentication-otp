@@ -31,7 +31,7 @@ type CreateUserResult {
   otp: String
   govId: [String]
   proofOfAddress: [String]
-  UserRole: String
+  UserRole: UserRoleValue
 }
 
 type phone {
