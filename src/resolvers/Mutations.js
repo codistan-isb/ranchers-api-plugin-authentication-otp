@@ -1,6 +1,7 @@
 import { generateOtp } from "../util/otp.js";
 import { verifyOTP } from "../util/otp.js";
 import pkg from 'mongodb';
+import ObjectID from "mongodb";
 const { Long } = pkg;
 import password_1 from "@accounts/password";
 import server_1 from "@accounts/server";
@@ -327,30 +328,30 @@ export default {
       throw new Error('UnAuthorization!');
     }
     const { users, Accounts } = context.collections;
-    const { phone } = args;
+    const { userId } = args;
 
-    const phoneNum = Long.fromString(phone)
-    console.log(phoneNum)
-    const query = { phone: phoneNum };
+
+    const query = { _id: ObjectID(userId) };
     console.log('query:', query);
+
     // const usersList = await users.find().toArray();
     // usersList.forEach(user => {
     //   console.log(user.phone);
     //   return user.phone
     // });
-    const userResponse = await users.findOne({ phone: phone });
-    const userAccountResponse = await Accounts.findOne({ phone: phone });
+
+    const userResponse = await users.findOne({ _id: args.userId });
+    const userAccountResponse = await Accounts.findOne({ _id: args.userId });
     console.log("User Response : ", userResponse)
     if (!userResponse) {
       throw new Error(`User not found`);
     }
-
     const UserPermission = await canCreateUser(context.user.userRole, userResponse.userRole)
     console.log(UserPermission)
     if (UserPermission) {
-      const deleteResult = await users.deleteOne({ _id: userResponse._id });
+      const deleteResult = await users.deleteOne({ _id: args.userId});
       console.log(deleteResult)
-      const deleteAccountResult = await Accounts.deleteOne({ _id: userAccountResponse._id });
+      const deleteAccountResult = await Accounts.deleteOne({ _id: args.userId});
       if (deleteResult.deletedCount > 0 || deleteAccountResult.deletedCount > 0) {
         return true; // User deleted successfully, return true
       }

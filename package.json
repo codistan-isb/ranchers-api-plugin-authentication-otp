@@ -1,7 +1,7 @@
 {
   "name": "@shoaibfarooq3/ranchers-api-plugin-authentication-otp",
   "description": "Authentication plugin for the Reaction API",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "main": "index.js",
   "type": "module",
   "engines": {
