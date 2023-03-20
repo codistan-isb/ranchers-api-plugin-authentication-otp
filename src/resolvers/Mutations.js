@@ -349,9 +349,9 @@ export default {
     const UserPermission = await canCreateUser(context.user.userRole, userResponse.userRole)
     console.log(UserPermission)
     if (UserPermission) {
-      const deleteResult = await users.deleteOne({ _id: args.userId});
+      const deleteResult = await users.deleteOne({ _id: args.userId });
       console.log(deleteResult)
-      const deleteAccountResult = await Accounts.deleteOne({ _id: args.userId});
+      const deleteAccountResult = await Accounts.deleteOne({ _id: args.userId });
       if (deleteResult.deletedCount > 0 || deleteAccountResult.deletedCount > 0) {
         return true; // User deleted successfully, return true
       }
@@ -365,6 +365,8 @@ export default {
     }
     return UserPermission;
   }
+
+
 
 
 };
