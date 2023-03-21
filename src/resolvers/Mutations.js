@@ -149,8 +149,9 @@ export default {
       console.log(user.UserRole)
 
       // Check Permission for create user
-
-      const UserPermission = canCreateUser(ctx.user.userRole, user.UserRole)
+      console.log(ctx.user.UserRole)
+      console.log(user.UserRole)
+      const UserPermission = canCreateUser(ctx.user.UserRole, user.UserRole)
       console.log(UserPermission)
       if (UserPermission) {
         // Allow user creation
@@ -315,8 +316,6 @@ export default {
       return authenticated;
     }
   },
-
-
   async deleteUser(parent, args, context, info) {
     console.log("context.user ", context.user);
     console.log("args ", args);
@@ -365,8 +364,4 @@ export default {
     }
     return UserPermission;
   }
-
-
-
-
 };
