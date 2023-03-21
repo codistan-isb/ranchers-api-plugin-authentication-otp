@@ -12,7 +12,7 @@ const mySchema = importAsString("./schema.graphql");
  * @returns {undefined}
  */
 const resolvers = {
-  Account,
+  // Account,
   Mutation
 };
 
