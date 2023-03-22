@@ -144,7 +144,7 @@ export default {
       if (ctx.user === undefined || ctx.user === null) {
         throw new Error("Unauthorized")
       }
-      console.log(ctx.user.userRole)
+      console.log(ctx.user.UserRole)
       console.log(user)
       console.log(user.UserRole)
 
@@ -345,7 +345,7 @@ export default {
     if (!userResponse) {
       throw new Error(`User not found`);
     }
-    const UserPermission = await canCreateUser(context.user.userRole, userResponse.userRole)
+    const UserPermission = await canCreateUser(context.user.UserRole, userResponse.UserRole)
     console.log(UserPermission)
     if (UserPermission) {
       const deleteResult = await users.deleteOne({ _id: args.userId });
