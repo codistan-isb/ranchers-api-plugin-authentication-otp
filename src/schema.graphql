@@ -50,7 +50,7 @@ type sendOtpResponse {
 extend type Mutation {
   checkUserExist(phone: String, email: String): Boolean
   sendOTP(phone: String, email: String): Boolean
-  deleteUser(phone: String!): Boolean
+  deleteUser(userId: String!): Boolean
   createUserWithOtp(user: CreateUserInput!): CreateUserResult
   verifyOTP(phone: String, otp: String): verifyOTPResponse
   authenticateWithOTP(
