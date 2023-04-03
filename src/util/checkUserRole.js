@@ -1,7 +1,7 @@
 export function canCreateUser(DbUserRole, userRoleNeeded) {
   if (DbUserRole === "Admin" || DbUserRole === "admin") {
     return true;
-  } else if (DbUserRole === "Dispatcher" || DbUserRole === "Dispatcher") {
+  } else if (DbUserRole === "Dispatcher" || DbUserRole === "dispatcher") {
     if (userRoleNeeded === "admin") {
       return false;
     } else {

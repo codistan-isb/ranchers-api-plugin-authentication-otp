@@ -6,6 +6,7 @@ const { Long } = pkg;
 import password_1 from "@accounts/password";
 import server_1 from "@accounts/server";
 import { canCreateUser } from "../util/checkUserRole.js";
+import { getGroupData } from "../util/getGroupData.js";
 
 export default {
   async sendOTP(parent, args, context, info) {
@@ -98,7 +99,7 @@ export default {
   async createUser(_, { user }, ctx) {
     console.log(user);
     const { injector, infos, collections } = ctx;
-    const { Accounts } = collections;
+    const { Accounts, Groups } = collections;
     const accountsServer = injector.get(server_1.AccountsServer);
     const accountsPassword = injector.get(password_1.AccountsPassword);
     let userId;
@@ -144,7 +145,7 @@ export default {
       };
     } else {
       if (!ctx.authToken) {
-        throw new Error("Unauthorized");
+        throw new Error("Unauthorized User");
       }
       if (ctx.user === undefined || ctx.user === null) {
         throw new Error("Unauthorized");
@@ -158,10 +159,14 @@ export default {
       console.log(user.UserRole);
       const UserPermission = canCreateUser(ctx.user.UserRole, user.UserRole);
       console.log(UserPermission);
+      const GroupNameResp = await getGroupData(user.UserRole, Groups)
+      console.log("Group Name Resp in return :-", GroupNameResp)
       if (UserPermission) {
         // Allow user creation
         try {
+
           userId = await accountsPassword.createUser(user);
+          // console.log(userId)
         } catch (error) {
           // If ambiguousErrorMessages is true we obfuscate the email or username already exist error
           // to prevent user enumeration during user creation
@@ -193,7 +198,7 @@ export default {
                 "provides": "default"
               }
             ],
-            "groups": [],
+            "groups": [GroupNameResp],
             "name": null,
             "profile": {
               firstName: user.firstName,
@@ -215,7 +220,7 @@ export default {
           //   UserRole: user.UserRole
           // });
           const accountAdded = await Accounts.insertOne(account);
-          console.log(accountAdded)
+          // console.log(accountAdded)
         }
         // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
         // are not enabled at the same time
