@@ -1,5 +1,6 @@
 import { generateOtp } from "../util/otp.js";
 import { verifyOTP } from "../util/otp.js";
+import ReactionError from "@reactioncommerce/reaction-error";
 import pkg from "mongodb";
 import ObjectID from "mongodb";
 const { Long } = pkg;
@@ -65,21 +66,25 @@ export default {
   },
 
   sendResetPasswordEmail: async (_, { email }, { injector }, ctx) => {
-    console.log(ctx);
+
+    // console.log(ctx);
     const { backgroundJobs, collections } = ctx;
-    console.log(collections);
-    console.log(backgroundJobs);
+    // console.log(collections);
+    // console.log(backgroundJobs);
     const accountsServer = injector.get(server_1.AccountsServer);
     const accountsPassword = injector.get(password_1.AccountsPassword);
     // const randomNumber = Math.floor(Math.random() * 1000000);
-    // console.log(randomNumber)
+    // console.log(accountsServer)
     // const user = await accountsServer.findUserByEmail(email);
+    // console.log(user)
     // if (!user) {
     //   throw new Error('User not found');
     // }
     try {
       // const otp = Math.floor(Math.random() * 1000000);
+      // console.log(otp)
       // await accountsPassword.sendResetPasswordEmail(user.id, otp);
+      // console.log(accountsPassword)
       // await accountsPassword.sendResetPasswordEmail(user, otp);
       await accountsPassword.sendResetPasswordEmail(email);
     } catch (error) {
@@ -145,10 +150,11 @@ export default {
       };
     } else {
       if (!ctx.authToken) {
-        throw new Error("Unauthorized User");
+        throw new ReactionError("access-denied", "Please Login First");
+
       }
       if (ctx.user === undefined || ctx.user === null) {
-        throw new Error("Unauthorized");
+        throw new ReactionError("access-denied", "Please Login First");
       }
       console.log(ctx.user.UserRole);
       console.log(user);
@@ -188,6 +194,7 @@ export default {
           };
         }
         if (userId) {
+          const currentOrderDate = new Date().toISOString();
           const account = {
             "_id": userId,
             "acceptsMarketing": false,
@@ -210,6 +217,8 @@ export default {
             "state": "new",
             "userId": userId,
             "UserRole": user.UserRole,
+            "currentStatus": "online",
+            "createdAt": new Date().toISOString()
           }
           // const accountAdded = await Accounts.insertOne({
           //   _id: userId,
@@ -220,7 +229,7 @@ export default {
           //   UserRole: user.UserRole
           // });
           const accountAdded = await Accounts.insertOne(account);
-          // console.log(accountAdded)
+          console.log("account Added:- ", accountAdded)
         }
         // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
         // are not enabled at the same time

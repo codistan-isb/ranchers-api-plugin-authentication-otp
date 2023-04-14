@@ -1,12 +1,12 @@
 {
-  "name": "@blackspider1994/api-plugin-authentication-otp",
-  "version": "2.2.4",
+  "name": "@shoaibfarooq3/ranchers-api-plugin-authentication-otp",
+  "version": "9.5.7",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
-      "name": "@blackspider1994/api-plugin-authentication-otp",
-      "version": "2.2.4",
+      "name": "@shoaibfarooq3/ranchers-api-plugin-authentication-otp",
+      "version": "9.5.7",
       "license": "Apache-2.0",
       "dependencies": {
         "@accounts/graphql-api": "^0.33.0",

@@ -72,6 +72,7 @@ function sendOtp(number, body) {
 }
 export async function verifyOTP(number, otp, context) {
   console.log(number, otp)
+  console.log(dict)
   if (dict[number] == undefined || dict[number] == {}) {
     return {
       status: false,
