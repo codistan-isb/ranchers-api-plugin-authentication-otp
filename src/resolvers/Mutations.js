@@ -194,7 +194,7 @@ export default {
           };
         }
         if (userId) {
-          const currentOrderDate = new Date().toISOString();
+          const now = new Date();
           const account = {
             "_id": userId,
             "acceptsMarketing": false,
@@ -218,7 +218,7 @@ export default {
             "userId": userId,
             "UserRole": user.UserRole,
             "currentStatus": "online",
-            "createdAt": new Date().toISOString()
+            "createdAt": now
           }
           // const accountAdded = await Accounts.insertOne({
           //   _id: userId,
