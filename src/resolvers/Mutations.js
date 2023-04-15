@@ -130,6 +130,41 @@ export default {
           userId: accountsServer.options.ambiguousErrorMessages ? null : userId,
         };
       }
+      if (userId) {
+        const now = new Date();
+        const account = {
+          "_id": userId,
+          "acceptsMarketing": false,
+          "emails": [
+            {
+              "address": user.email,
+              "verified": false,
+              "provides": "default"
+            }
+          ],
+          "name": null,
+          "profile": {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            dob: user.dob,
+            phone: user.phone,
+          },
+          "shopId": null,
+          "state": "new",
+          "userId": userId,
+          "createdAt": now
+        }
+        // const accountAdded = await Accounts.insertOne({
+        //   _id: userId,
+        //   firstName: user.firstName,
+        //   lastName: user.lastName,
+        //   name: user.firstName + " " + user.lastName,
+        //   phone: user.phone,
+        //   UserRole: user.UserRole
+        // });
+        const accountAdded = await Accounts.insertOne(account);
+        console.log("account Added:- ", accountAdded)
+      }
       // if (userId) {
       //         const accountAdded = await Accounts.insertOne({ _id: userId, firstName: user.firstName, lastName: user.lastName, name: user.firstName + " " + user.lastName, phone: user.phone })
 
