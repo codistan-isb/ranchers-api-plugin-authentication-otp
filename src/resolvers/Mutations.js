@@ -310,6 +310,41 @@ export default {
 
     try {
       userId = await accountsPassword.createUser(user);
+      if (userId) {
+        const now = new Date();
+        const account = {
+          "_id": userId,
+          "acceptsMarketing": false,
+          "emails": [
+            {
+              "address": user.email,
+              "verified": false,
+              "provides": "default"
+            }
+          ],
+          "name": null,
+          "profile": {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            dob: user.dob,
+            phone: user.phone,
+          },
+          "shopId": null,
+          "state": "new",
+          "userId": userId,
+          "createdAt": now
+        }
+        // const accountAdded = await Accounts.insertOne({
+        //   _id: userId,
+        //   firstName: user.firstName,
+        //   lastName: user.lastName,
+        //   name: user.firstName + " " + user.lastName,
+        //   phone: user.phone,
+        //   UserRole: user.UserRole
+        // });
+        const accountAdded = await Accounts.insertOne(account);
+        console.log("create User With Otp account Added:- ", accountAdded)
+      }
     } catch (error) {
       // If ambiguousErrorMessages is true we obfuscate the email or username already exist error
       // to prevent user enumeration during user creation
@@ -358,6 +393,7 @@ export default {
         userId: userId,
       };
       const accountAdded = await Accounts.insertOne(account);
+      console.log("createUserWithOtp Account Lower", accountAdded)
     }
     // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
     // are not enabled at the same time
