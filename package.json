@@ -1,5 +1,5 @@
 {
-  "name": "@shoaibfarooq3/ranchers-api-plugin-authentication-otp",
+  "name": "@codistan-isb/ranchers-api-plugin-authentication-otp",
   "description": "Authentication plugin for the Reaction API",
   "version": "9.6.3",
   "main": "index.js",
