@@ -30,7 +30,7 @@ export default async (app) => {
     {
       validateNewUser: async (user) => {
         // You can apply some custom validation
-        console.log("user", user)
+        // console.log("user", user)
         let userObj = {};
         userObj = { ...user,  phone: user.phone, phoneVerified: false  }
 

@@ -16,8 +16,8 @@ export function generateOtp(number) {
       let my_otp = 123456; // () => [ min, max );
       // let my_otp = Math.floor(Math.random() * (max - min + 1) + min); // () => [ min, max );
       dict[number] = { code: my_otp, expiry: new Date().getTime() + 60000 };
-      console.log("otp generated", number,
-        "Your verification code for is " + my_otp)
+      // console.log("otp generated", number,
+      //   "Your verification code for is " + my_otp)
       sendOtp(
         number,
         "Your verification code for is " + my_otp
@@ -71,8 +71,8 @@ function sendOtp(number, body) {
   });
 }
 export async function verifyOTP(number, otp, context) {
-  console.log(number, otp)
-  console.log(dict)
+  // console.log(number, otp)
+  // console.log(dict)
   if (dict[number] == undefined || dict[number] == {}) {
     return {
       status: false,
@@ -80,7 +80,7 @@ export async function verifyOTP(number, otp, context) {
     }
   }
   const isValid = dict[number]["expiry"] - new Date().getTime() > 0;
-  console.log("isValid", isValid)
+  // console.log("isValid", isValid)
   if (!isValid) {
     delete dict[number];
 
@@ -96,7 +96,7 @@ export async function verifyOTP(number, otp, context) {
     const { users } = collections;
 
     const userObj = await users.updateOne({ "phone": number }, { $set: { "phoneVerified": "true" } })
-    console.log("isValid", isValid)
+    // console.log("isValid", isValid)
 
     return {
       status: true,

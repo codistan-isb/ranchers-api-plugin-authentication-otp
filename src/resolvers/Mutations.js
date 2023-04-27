@@ -11,11 +11,11 @@ import { getGroupData } from "../util/getGroupData.js";
 
 export default {
   async sendOTP(parent, args, context, info) {
-    console.log("sending otp console");
+    // console.log("sending otp console");
     const { collections } = context;
     const { users } = collections;
 
-    console.log("sendOTP");
+    // console.log("sendOTP");
     let msisdn;
     if (args.phone && args.phone.length > 10 && args.phone[0] == "+") {
       msisdn = args.phone;
@@ -32,7 +32,7 @@ export default {
     }
 
     const res = await generateOtp(msisdn);
-    console.log("res", res);
+    // console.log("res", res);
     return res;
   },
   async checkUserExist(parent, args, context, info) {
@@ -40,15 +40,15 @@ export default {
     const { users } = collections;
     const email = args.email;
     const phone = args.phone;
-    console.log(args);
+    // console.log(args);
 
     let userExist = await users.findOne({ phone: phone });
     if (!userExist) {
       userExist = await users.findOne({ "emails.0.address": email });
     }
 
-    console.log("userExist");
-    console.log(userExist);
+    // console.log("userExist");
+    // console.log(userExist);
 
     if (userExist !== null) {
       return true;
@@ -102,7 +102,7 @@ export default {
     return null;
   },
   async createUser(_, { user }, ctx) {
-    console.log(user);
+    // console.log(user);
     const { injector, infos, collections } = ctx;
     const { Accounts, Groups } = collections;
     const accountsServer = injector.get(server_1.AccountsServer);
@@ -163,7 +163,7 @@ export default {
         //   UserRole: user.UserRole
         // });
         const accountAdded = await Accounts.insertOne(account);
-        console.log("account Added:- ", accountAdded)
+        // console.log("account Added:- ", accountAdded)
       }
       // if (userId) {
       //         const accountAdded = await Accounts.insertOne({ _id: userId, firstName: user.firstName, lastName: user.lastName, name: user.firstName + " " + user.lastName, phone: user.phone })
@@ -191,17 +191,17 @@ export default {
       if (ctx.user === undefined || ctx.user === null) {
         throw new ReactionError("access-denied", "Please Login First");
       }
-      console.log(ctx.user.UserRole);
-      console.log(user);
-      console.log(user.UserRole);
+      // console.log(ctx.user.UserRole);
+      // console.log(user);
+      // console.log(user.UserRole);
 
       // Check Permission for create user
-      console.log(ctx.user.UserRole);
-      console.log(user.UserRole);
+      // console.log(ctx.user.UserRole);
+      // console.log(user.UserRole);
       const UserPermission = canCreateUser(ctx.user.UserRole, user.UserRole);
-      console.log(UserPermission);
+      // console.log(UserPermission);
       const GroupNameResp = await getGroupData(user.UserRole, Groups)
-      console.log("Group Name Resp in return :-", GroupNameResp)
+      // console.log("Group Name Resp in return :-", GroupNameResp)
       if (UserPermission) {
         // Allow user creation
         try {
@@ -264,7 +264,7 @@ export default {
           //   UserRole: user.UserRole
           // });
           const accountAdded = await Accounts.insertOne(account);
-          console.log("account Added:- ", accountAdded)
+          // console.log("account Added:- ", accountAdded)
         }
         // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
         // are not enabled at the same time
@@ -343,7 +343,7 @@ export default {
         //   UserRole: user.UserRole
         // });
         const accountAdded = await Accounts.insertOne(account);
-        console.log("create User With Otp account Added:- ", accountAdded)
+        // console.log("create User With Otp account Added:- ", accountAdded)
       }
     } catch (error) {
       // If ambiguousErrorMessages is true we obfuscate the email or username already exist error
@@ -367,9 +367,9 @@ export default {
     const adminCount = await Accounts.findOne({
       "adminUIShopIds.0": { $ne: null },
     });
-    console.log("adminCount", adminCount);
+    // console.log("adminCount", adminCount);
     if (userId && adminCount?._id) {
-      console.log("user", user);
+      // console.log("user", user);
       const account = {
         _id: userId,
         acceptsMarketing: false,
@@ -393,7 +393,7 @@ export default {
         userId: userId,
       };
       const accountAdded = await Accounts.insertOne(account);
-      console.log("createUserWithOtp Account Lower", accountAdded)
+      // console.log("createUserWithOtp Account Lower", accountAdded)
     }
     // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
     // are not enabled at the same time
@@ -424,9 +424,9 @@ export default {
     const userExist = await users.findOne({
       "emails.0.address": params?.user?.email,
     });
-    console.log("user exist is ", userExist);
+    // console.log("user exist is ", userExist);
     const resOTP = await verifyOTP(userExist.phone, params.code, ctx);
-    console.log("status", resOTP);
+    // console.log("status", resOTP);
     // console.log(userExist)
     // if (userExist.phoneVerified) {
     //         const authenticated = await injector
@@ -441,13 +441,13 @@ export default {
       const authenticated = await injector
         .get(server_1.AccountsServer)
         .loginWithService(serviceName, params, infos);
-      console.log("authenticated", authenticated);
+      // console.log("authenticated", authenticated);
       return authenticated;
     }
   },
   async deleteUser(parent, args, context, info) {
-    console.log("context.user ", context.user);
-    console.log("args ", args);
+    // console.log("context.user ", context.user);
+    // console.log("args ", args);
     // console.log("context ", context)
     if (context.user === undefined || context.user === null) {
       throw new Error("Unauthorized access. Please login first");
@@ -460,7 +460,7 @@ export default {
     const { userId } = args;
 
     const query = { _id: ObjectID(userId) };
-    console.log("query:", query);
+    // console.log("query:", query);
 
     // const usersList = await users.find().toArray();
     // usersList.forEach(user => {
@@ -473,7 +473,7 @@ export default {
       throw new Error("Cannot delete Super Admin");
     }
     const userResponse = await users.findOne({ _id: args.userId });
-    console.log("User Response : ", userResponse);
+    // console.log("User Response : ", userResponse);
     if (!userResponse) {
       throw new Error(`User not found`);
     }
@@ -481,10 +481,10 @@ export default {
       context.user.UserRole,
       userResponse.UserRole
     );
-    console.log(UserPermission);
+    // console.log(UserPermission);
     if (UserPermission) {
       const deleteResult = await users.deleteOne({ _id: args.userId });
-      console.log(deleteResult);
+      // console.log(deleteResult);
       const deleteAccountResult = await Accounts.deleteOne({
         _id: args.userId,
       });
