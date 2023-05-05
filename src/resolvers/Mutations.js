@@ -66,11 +66,7 @@ export default {
   },
 
   sendResetPasswordEmail: async (_, { email }, { injector }, ctx) => {
-
-    // console.log(ctx);
     const { backgroundJobs, collections } = ctx;
-    // console.log(collections);
-    // console.log(backgroundJobs);
     const accountsServer = injector.get(server_1.AccountsServer);
     const accountsPassword = injector.get(password_1.AccountsPassword);
     // const randomNumber = Math.floor(Math.random() * 1000000);
