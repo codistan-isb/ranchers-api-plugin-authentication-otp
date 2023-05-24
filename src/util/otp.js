@@ -42,7 +42,7 @@ export function generateOtp(number) {
 function sendOtp(number, body) {
   return new Promise((resolve, reject) => {
     try {
-      console.log("twilio send otp ", number, body)
+      // console.log("twilio send otp ", number, body)
 
       //Sending Reset OTP to user number
       client.messages.create({
@@ -51,7 +51,7 @@ function sendOtp(number, body) {
         from: process.env.TWILIO_PHONE_NO
 
       }).then((data) => {
-        console.log(data)
+        // console.log(data)
         resolve(true)
       }).catch((err) => {
         console.log("testing")

@@ -195,7 +195,7 @@ export default {
         // console.log("AllBranchIDs ", AllBranchIDs);
         // userId = await accountsPassword.createUser(user);
         user.branches = AllBranchIDs;
-        console.log("branches ", user);
+        // console.log("branches ", user);
       }
       else {
         user.branches = [];
@@ -246,7 +246,7 @@ export default {
         //   UserRole: user.UserRole
         // });
         const accountAdded = await Accounts.insertOne(account);
-        console.log("account Added:- ", accountAdded)
+        // console.log("account Added:- ", accountAdded)
       }
       // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
       // are not enabled at the same time
@@ -279,7 +279,7 @@ export default {
       const UserPermission = canCreateUser(ctx.user.UserRole, user.UserRole);
       // console.log(UserPermission);
       const GroupNameResp = await getGroupData(user.UserRole, Groups)
-      console.log("Group Name Resp in return :-", GroupNameResp)
+      // console.log("Group Name Resp in return :-", GroupNameResp)
       if (UserPermission) {
         // Allow user creation
         try {
