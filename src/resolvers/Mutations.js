@@ -197,9 +197,6 @@ export default {
         user.branches = AllBranchIDs;
         // console.log("branches ", user);
       }
-      else {
-        user.branches = [];
-      }
 
       userId = await accountsPassword.createUser(user);
       if (!accountsServer.options.enableAutologin) {
