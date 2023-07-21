@@ -107,6 +107,7 @@ export default {
     let AllBranchIDs;
     if (!user.UserRole) {
       try {
+        user.UserRole = "customer";
         userId = await accountsPassword.createUser(user);
       } catch (error) {
         // If ambiguousErrorMessages is true we obfuscate the email or username already exist error
@@ -129,27 +130,28 @@ export default {
       if (userId) {
         const now = new Date();
         const account = {
-          "_id": userId,
-          "acceptsMarketing": false,
-          "emails": [
+          _id: userId,
+          acceptsMarketing: false,
+          emails: [
             {
-              "address": user.email,
-              "verified": false,
-              "provides": "default"
-            }
+              address: user.email,
+              verified: false,
+              provides: "default",
+            },
           ],
-          "name": null,
-          "profile": {
+          name: null,
+          profile: {
             firstName: user.firstName,
             lastName: user.lastName,
             dob: user.dob,
             phone: user.phone,
           },
-          "shopId": null,
-          "state": "new",
-          "userId": userId,
-          "createdAt": now
-        }
+          UserRole: "customer",
+          shopId: null,
+          state: "new",
+          userId: userId,
+          createdAt: now,
+        };
         // const accountAdded = await Accounts.insertOne({
         //   _id: userId,
         //   firstName: user.firstName,
@@ -179,7 +181,7 @@ export default {
         userId,
         loginResult,
       };
-    } else if (user.UserRole === 'admin') {
+    } else if (user.UserRole === "admin") {
       if (!ctx.authToken) {
         throw new ReactionError("access-denied", "Please Login First");
       }
@@ -189,10 +191,10 @@ export default {
       const GroupNameResp = await getGroupData(user.UserRole, Groups);
       // console.log("Group Name Resp in return :-", GroupNameResp);
       const branchData = await BranchData.find({}).toArray();
-      // console.log("branch Data ", branchData);
+      console.log("branch Data ", branchData);
       if (branchData) {
-        AllBranchIDs = branchData.map(data => data._id);
-        // console.log("AllBranchIDs ", AllBranchIDs);
+        AllBranchIDs = branchData.map((data) => data._id);
+        console.log("AllBranchIDs ", AllBranchIDs);
         // userId = await accountsPassword.createUser(user);
         user.branches = AllBranchIDs;
         // console.log("branches ", user);
@@ -201,39 +203,37 @@ export default {
       userId = await accountsPassword.createUser(user);
       if (!accountsServer.options.enableAutologin) {
         return {
-          userId: accountsServer.options.ambiguousErrorMessages
-            ? null
-            : userId,
+          userId: accountsServer.options.ambiguousErrorMessages ? null : userId,
         };
       }
       if (userId) {
         const now = new Date();
         const account = {
-          "_id": userId,
-          "acceptsMarketing": false,
-          "emails": [
+          _id: userId,
+          acceptsMarketing: false,
+          emails: [
             {
-              "address": user.email,
-              "verified": false,
-              "provides": "default"
-            }
+              address: user.email,
+              verified: false,
+              provides: "default",
+            },
           ],
-          "groups": [GroupNameResp],
-          "name": null,
-          "profile": {
+          groups: [GroupNameResp],
+          name: null,
+          profile: {
             firstName: user.firstName,
             lastName: user.lastName,
             dob: user.dob,
             phone: user.phone,
           },
-          "shopId": null,
-          "state": "new",
-          "userId": userId,
-          "UserRole": user.UserRole,
-          "currentStatus": "online",
-          "createdAt": now,
-          "branches": user.branches
-        }
+          shopId: null,
+          state: "new",
+          userId: userId,
+          UserRole: user.UserRole,
+          currentStatus: "online",
+          createdAt: now,
+          branches: user.branches,
+        };
         // const accountAdded = await Accounts.insertOne({
         //   _id: userId,
         //   firstName: user.firstName,
@@ -275,12 +275,11 @@ export default {
       // console.log(user.UserRole);
       const UserPermission = canCreateUser(ctx.user.UserRole, user.UserRole);
       // console.log(UserPermission);
-      const GroupNameResp = await getGroupData(user.UserRole, Groups)
+      const GroupNameResp = await getGroupData(user.UserRole, Groups);
       // console.log("Group Name Resp in return :-", GroupNameResp)
       if (UserPermission) {
         // Allow user creation
         try {
-
           userId = await accountsPassword.createUser(user);
           // console.log(userId)
         } catch (error) {
@@ -306,30 +305,30 @@ export default {
         if (userId) {
           const now = new Date();
           const account = {
-            "_id": userId,
-            "acceptsMarketing": false,
-            "emails": [
+            _id: userId,
+            acceptsMarketing: false,
+            emails: [
               {
-                "address": user.email,
-                "verified": false,
-                "provides": "default"
-              }
+                address: user.email,
+                verified: false,
+                provides: "default",
+              },
             ],
-            "groups": [GroupNameResp],
-            "name": null,
-            "profile": {
+            groups: [GroupNameResp],
+            name: null,
+            profile: {
               firstName: user.firstName,
               lastName: user.lastName,
               dob: user.dob,
               phone: user.phone,
             },
-            "shopId": null,
-            "state": "new",
-            "userId": userId,
-            "UserRole": user.UserRole,
-            "currentStatus": "online",
-            "createdAt": now
-          }
+            shopId: null,
+            state: "new",
+            userId: userId,
+            UserRole: user.UserRole,
+            currentStatus: "online",
+            createdAt: now,
+          };
           // const accountAdded = await Accounts.insertOne({
           //   _id: userId,
           //   firstName: user.firstName,
@@ -388,27 +387,27 @@ export default {
       if (userId) {
         const now = new Date();
         const account = {
-          "_id": userId,
-          "acceptsMarketing": false,
-          "emails": [
+          _id: userId,
+          acceptsMarketing: false,
+          emails: [
             {
-              "address": user.email,
-              "verified": false,
-              "provides": "default"
-            }
+              address: user.email,
+              verified: false,
+              provides: "default",
+            },
           ],
-          "name": null,
-          "profile": {
+          name: null,
+          profile: {
             firstName: user.firstName,
             lastName: user.lastName,
             dob: user.dob,
             phone: user.phone,
           },
-          "shopId": null,
-          "state": "new",
-          "userId": userId,
-          "createdAt": now
-        }
+          shopId: null,
+          state: "new",
+          userId: userId,
+          createdAt: now,
+        };
         // const accountAdded = await Accounts.insertOne({
         //   _id: userId,
         //   firstName: user.firstName,
@@ -544,7 +543,11 @@ export default {
     // });
 
     const userAccountResponse = await Accounts.findOne({ _id: args.userId });
-    if (userAccountResponse && userAccountResponse.adminUIShopIds && userAccountResponse.adminUIShopIds.length > 0) {
+    if (
+      userAccountResponse &&
+      userAccountResponse.adminUIShopIds &&
+      userAccountResponse.adminUIShopIds.length > 0
+    ) {
       throw new Error("Cannot delete Super Admin");
     }
     const userResponse = await users.findOne({ _id: args.userId });
