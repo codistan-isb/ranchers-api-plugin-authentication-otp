@@ -191,10 +191,10 @@ export default {
       const GroupNameResp = await getGroupData(user.UserRole, Groups);
       // console.log("Group Name Resp in return :-", GroupNameResp);
       const branchData = await BranchData.find({}).toArray();
-      console.log("branch Data ", branchData);
+      // console.log("branch Data ", branchData);
       if (branchData) {
         AllBranchIDs = branchData.map((data) => data._id);
-        console.log("AllBranchIDs ", AllBranchIDs);
+        // console.log("AllBranchIDs ", AllBranchIDs);
         // userId = await accountsPassword.createUser(user);
         user.branches = AllBranchIDs;
         // console.log("branches ", user);
