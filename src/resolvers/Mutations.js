@@ -139,7 +139,7 @@ export default {
               provides: "default",
             },
           ],
-          name: null,
+          name: user.firstName + " " + user.lastName,
           profile: {
             firstName: user.firstName,
             lastName: user.lastName,
@@ -151,6 +151,7 @@ export default {
           state: "new",
           userId: userId,
           createdAt: now,
+          isActive: true,
         };
         // const accountAdded = await Accounts.insertOne({
         //   _id: userId,
@@ -176,7 +177,7 @@ export default {
         createdUser,
         infos
       );
-      await generateOtp(user.phone);
+      // await generateOtp(user.phone);
       return {
         userId,
         loginResult,
@@ -219,7 +220,7 @@ export default {
             },
           ],
           groups: [GroupNameResp],
-          name: null,
+          name: user.firstName + " " + user.lastName,
           profile: {
             firstName: user.firstName,
             lastName: user.lastName,
@@ -233,6 +234,7 @@ export default {
           currentStatus: "online",
           createdAt: now,
           branches: user.branches,
+          isActive: true,
         };
         // const accountAdded = await Accounts.insertOne({
         //   _id: userId,
@@ -254,7 +256,7 @@ export default {
         createdUser,
         infos
       );
-      await generateOtp(user.phone);
+      // await generateOtp(user.phone);
       return {
         userId,
         loginResult,
@@ -315,7 +317,7 @@ export default {
               },
             ],
             groups: [GroupNameResp],
-            name: null,
+            name: user.firstName + " " + user.lastName,
             profile: {
               firstName: user.firstName,
               lastName: user.lastName,
@@ -328,6 +330,7 @@ export default {
             UserRole: user.UserRole,
             currentStatus: "online",
             createdAt: now,
+            isActive: true,
           };
           // const accountAdded = await Accounts.insertOne({
           //   _id: userId,
@@ -349,7 +352,7 @@ export default {
           createdUser,
           infos
         );
-        await generateOtp(user.phone);
+        // await generateOtp(user.phone);
         return {
           userId,
           loginResult,
