@@ -5,7 +5,6 @@ var dict = {};
 
 var accountSid = process.env.TWILIO_ACCOUNT_SID;
 var authToken = process.env.TWILIO_AUTH_TOKEN;
-// const client = new Twilio(accountSid, authToken);
 const client = new Twilio("ACa6213af064b", "");
 
 export function generateOtp(number) {
@@ -13,11 +12,9 @@ export function generateOtp(number) {
     try {
       let min = 100000;
       let max = 999999;
-      let my_otp = 123456; // () => [ min, max );
-      // let my_otp = Math.floor(Math.random() * (max - min + 1) + min); // () => [ min, max );
+      let my_otp = 123456;
       dict[number] = { code: my_otp, expiry: new Date().getTime() + 60000 };
-      // console.log("otp generated", number,
-      //   "Your verification code for is " + my_otp)
+  
       sendOtp(
         number,
         "Your verification code for is " + my_otp
@@ -31,7 +28,6 @@ export function generateOtp(number) {
       })
 
 
-      // return res;
     } catch (err) {
       console.log("reaching", err)
       resolve(false);
@@ -42,7 +38,6 @@ export function generateOtp(number) {
 function sendOtp(number, body) {
   return new Promise((resolve, reject) => {
     try {
-      // console.log("twilio send otp ", number, body)
 
       //Sending Reset OTP to user number
       client.messages.create({
@@ -51,7 +46,6 @@ function sendOtp(number, body) {
         from: process.env.TWILIO_PHONE_NO
 
       }).then((data) => {
-        // console.log(data)
         resolve(true)
       }).catch((err) => {
         console.log("testing")
@@ -71,8 +65,7 @@ function sendOtp(number, body) {
   });
 }
 export async function verifyOTP(number, otp, context) {
-  // console.log(number, otp)
-  // console.log(dict)
+
   if (dict[number] == undefined || dict[number] == {}) {
     return {
       status: false,
@@ -80,7 +73,6 @@ export async function verifyOTP(number, otp, context) {
     }
   }
   const isValid = dict[number]["expiry"] - new Date().getTime() > 0;
-  // console.log("isValid", isValid)
   if (!isValid) {
     delete dict[number];
 
@@ -96,7 +88,6 @@ export async function verifyOTP(number, otp, context) {
     const { users } = collections;
 
     const userObj = await users.updateOne({ "phone": number }, { $set: { "phoneVerified": "true" } })
-    // console.log("isValid", isValid)
 
     return {
       status: true,

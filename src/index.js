@@ -6,11 +6,6 @@ import Mutation from "./resolvers/Mutations.js";
 import importAsString from "@reactioncommerce/api-utils/importAsString.js";
 const mySchema = importAsString("./schema.graphql");
 
-/**
- * @summary Registers the authentication plugin
- * @param {ReactionAPI} app The ReactionAPI instance
- * @returns {undefined}
- */
 const resolvers = {
   // Account,
   Mutation,
