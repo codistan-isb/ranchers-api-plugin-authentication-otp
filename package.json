@@ -1,7 +1,7 @@
 {
   "name": "@codistan-isb/ranchers-api-plugin-authentication-otp",
   "description": "Authentication plugin for the Reaction API",
-  "version": "9.7.6",
+  "version": "9.7.7",
   "main": "index.js",
   "type": "module",
   "engines": {
