@@ -4,7 +4,7 @@ import { AccountsServer } from "@accounts/server";
 import { AccountsPassword } from "@accounts/password";
 import mongoose from "mongoose";
 import config from "../config.js";
-import pkg from '@accounts/graphql-api';
+import pkg from "@accounts/graphql-api";
 
 const { AccountsModule } = pkg;
 let accountsServer;
@@ -26,18 +26,16 @@ export default async (app) => {
     idProvider: () => mongoose.Types.ObjectId().toString()
   });
 
-  const password = new AccountsPassword(
-    {
-      validateNewUser: async (user) => {
-        // You can apply some custom validation
-        let userObj = {};
-        userObj = { ...user,  phone: user.phone, phoneVerified: false  }
+  const password = new AccountsPassword({
+    validateNewUser: async (user) => {
+      // You can apply some custom validation
+      let userObj = {};
+      userObj = { ...user, phone: user.phone, phoneVerified: false };
 
-        // We specify all the fields that can be inserted in the database
-        return userObj;
-      }
+      // We specify all the fields that can be inserted in the database
+      return userObj;
     }
-  );
+  });
 
   accountsServer = new AccountsServer(
     {
@@ -45,11 +43,12 @@ export default async (app) => {
       tokenSecret: TOKEN_SECRET,
       tokenConfigs: {
         accessToken: {
-            expiresIn: '30d',
+          expiresIn: "30d"
         },
         refreshToken: {
-            expiresIn: '90d',
-        }},
+          expiresIn: "90d"
+        }
+      },
       db: accountsMongo,
       enableAutologin: true,
       ambiguousErrorMessages: false,
