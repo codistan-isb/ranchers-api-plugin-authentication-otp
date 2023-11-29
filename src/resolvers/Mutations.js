@@ -76,11 +76,12 @@ export default {
     return null;
   },
   async createUser(_, { user }, ctx) {
-    const { injector, infos, collections } = ctx;
+    const { injector, infos, collections, appEvents } = ctx;
     const { Accounts, Groups, BranchData } = collections;
     const accountsServer = injector.get(server_1.AccountsServer);
     const accountsPassword = injector.get(password_1.AccountsPassword);
     let userId;
+    let account;
     let AllBranchIDs;
     if (!user.UserRole) {
       try {
@@ -124,7 +125,7 @@ export default {
             phone: user.phone,
           },
           UserRole: "customer",
-          shopId: null,
+          shopId: "4N3s6SBCET5jn6RGf",
           state: "new",
           userId: userId,
           createdAt: now,
@@ -139,6 +140,9 @@ export default {
         //   UserRole: user.UserRole
         // });
         const accountAdded = await Accounts.insertOne(account);
+        console.log("before app event");
+        await appEvents.emit("afterCreateUserAccount", { createdBy: userId, account });
+
         // console.log("account Added:- ", accountAdded)
       }
       // if (userId) {
@@ -150,6 +154,7 @@ export default {
       const createdUser = await accountsServer.findUserById(userId);
       // If we are here - user must be created successfully
       // Explicitly saying this to Typescript compiler
+
       const loginResult = await accountsServer.loginWithUser(
         createdUser,
         infos
@@ -181,7 +186,7 @@ export default {
       }
       if (userId) {
         const now = new Date();
-        const account = {
+        account = {
           _id: userId,
           acceptsMarketing: false,
           emails: [
@@ -199,16 +204,19 @@ export default {
             dob: user.dob,
             phone: user.phone,
           },
-          shopId: null,
+          shopId: "4N3s6SBCET5jn6RGf",
           state: "new",
           userId: userId,
           UserRole: user.UserRole,
           currentStatus: "online",
           createdAt: now,
+          updatedAt: now,
           branches: user.branches,
           isActive: true,
         };
-        const accountAdded = await Accounts.insertOne(account);
+        await Accounts.insertOne(account);
+        await appEvents.emit("afterCreateUserAccount", { createdBy: userId, account });
+
       }
       // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
       // are not enabled at the same time
@@ -219,6 +227,10 @@ export default {
         createdUser,
         infos
       );
+      // await appEvents.emit("afterUserCreate", {
+      //   account,
+      //   createdBy: userId
+      // });
       return {
         userId,
         loginResult,
@@ -276,7 +288,7 @@ export default {
               dob: user.dob,
               phone: user.phone,
             },
-            shopId: null,
+            shopId: "4N3s6SBCET5jn6RGf",
             state: "new",
             userId: userId,
             UserRole: user.UserRole,
@@ -285,6 +297,7 @@ export default {
             isActive: true,
           };
           const accountAdded = await Accounts.insertOne(account);
+          await appEvents.emit("afterCreateUserAccount", { createdBy: userId, account });
         }
         // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
         // are not enabled at the same time
@@ -348,12 +361,14 @@ export default {
             dob: user.dob,
             phone: user.phone,
           },
-          shopId: null,
+          shopId: "4N3s6SBCET5jn6RGf",
           state: "new",
           userId: userId,
           createdAt: now,
         };
         const accountAdded = await Accounts.insertOne(account);
+        await appEvents.emit("afterCreateUserAccount", { createdBy: userId, account });
+
       }
     } catch (error) {
       // If ambiguousErrorMessages is true we obfuscate the email or username already exist error
@@ -396,11 +411,13 @@ export default {
           dob: user.dob,
           phone: user.phone,
         },
-        shopId: null,
+        shopId: "4N3s6SBCET5jn6RGf",
         state: "new",
         userId: userId,
       };
       const accountAdded = await Accounts.insertOne(account);
+      await appEvents.emit("afterCreateUserAccount", { createdBy: userId, account });
+
     }
     // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
     // are not enabled at the same time

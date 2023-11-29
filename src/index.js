@@ -5,6 +5,7 @@ import Account from "./resolvers/Account.js";
 import Mutation from "./resolvers/Mutations.js";
 import importAsString from "@reactioncommerce/api-utils/importAsString.js";
 const mySchema = importAsString("./schema.graphql");
+import preStartup from "./preStartup.js";
 
 const resolvers = {
   // Account,
@@ -25,6 +26,7 @@ export default async function register(app) {
     version: pkg.version,
     functionsByType: {
       graphQLContext: [({ req }) => accountsGraphQL.context({ req })],
+      preStartup: [preStartup],
       startup: [myAuthenticationStartup],
     },
     collections: {
