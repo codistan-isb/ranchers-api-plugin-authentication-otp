@@ -8,7 +8,7 @@ import password_1 from "@accounts/password";
 import server_1 from "@accounts/server";
 import { canCreateUser } from "../util/checkUserRole.js";
 import { getGroupData } from "../util/getGroupData.js";
-
+import sendOTPToVerifyEmailOTP from "../util/sendOTPToVerifyEmailOTP.js";
 export default {
   async sendOTP(parent, args, context, info) {
     const { collections } = context;
@@ -141,7 +141,10 @@ export default {
         // });
         const accountAdded = await Accounts.insertOne(account);
         console.log("before app event");
-        await appEvents.emit("afterCreateUserAccount", { createdBy: userId, account });
+        await appEvents.emit("afterCreateUserAccount", {
+          createdBy: userId,
+          account,
+        });
 
         // console.log("account Added:- ", accountAdded)
       }
@@ -215,8 +218,10 @@ export default {
           isActive: true,
         };
         await Accounts.insertOne(account);
-        await appEvents.emit("afterCreateUserAccount", { createdBy: userId, account });
-
+        await appEvents.emit("afterCreateUserAccount", {
+          createdBy: userId,
+          account,
+        });
       }
       // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
       // are not enabled at the same time
@@ -297,7 +302,10 @@ export default {
             isActive: true,
           };
           const accountAdded = await Accounts.insertOne(account);
-          await appEvents.emit("afterCreateUserAccount", { createdBy: userId, account });
+          await appEvents.emit("afterCreateUserAccount", {
+            createdBy: userId,
+            account,
+          });
         }
         // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
         // are not enabled at the same time
@@ -367,8 +375,10 @@ export default {
           createdAt: now,
         };
         const accountAdded = await Accounts.insertOne(account);
-        await appEvents.emit("afterCreateUserAccount", { createdBy: userId, account });
-
+        await appEvents.emit("afterCreateUserAccount", {
+          createdBy: userId,
+          account,
+        });
       }
     } catch (error) {
       // If ambiguousErrorMessages is true we obfuscate the email or username already exist error
@@ -416,8 +426,10 @@ export default {
         userId: userId,
       };
       const accountAdded = await Accounts.insertOne(account);
-      await appEvents.emit("afterCreateUserAccount", { createdBy: userId, account });
-
+      await appEvents.emit("afterCreateUserAccount", {
+        createdBy: userId,
+        account,
+      });
     }
     // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
     // are not enabled at the same time
@@ -434,12 +446,34 @@ export default {
   authenticate: async (_, args, ctx) => {
     const { serviceName, params } = args;
     const { injector, infos, collections } = ctx;
-    const { users } = collections;
+    const { users, AllowedDomains } = collections;
+    let discountDomains, customerDomain, userCheck, authenticated;
+    let AllowedDomainsData = await AllowedDomains.findOne({});
+    // console.log("AllowedDomainsData ", AllowedDomainsData?.domains);
+    discountDomains = AllowedDomainsData?.domains;
+    customerDomain = params?.user?.email?.split("@")[1];
     console.log("authenticate");
-    const authenticated = await injector
+    authenticated = await injector
       .get(server_1.AccountsServer)
       .loginWithService(serviceName, params, infos);
-    return authenticated;
+    // console.log("authenticated", authenticated);
+    if (discountDomains?.includes(customerDomain)) {
+      console.log("customerDomain in if check");
+      if (authenticated?.user?.emails[0].verified === true) {
+        return authenticated;
+      } else {
+        console.log("in else check for sending otp for verification");
+        await sendOTPToVerifyEmailOTP(ctx, params?.user?.email);
+        // console.log("OtpSendResp", OtpSendResp);
+        throw new ReactionError(
+          "access-denied",
+          "We have send you OTP for email verification, please verify email first, then login"
+        );
+      }
+    } else {
+      console.log("customerDomain in else check");
+      return authenticated;
+    }
   },
   authenticateWithOTP: async (_, args, ctx) => {
     const { serviceName, params } = args;
